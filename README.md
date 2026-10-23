@@ -30,7 +30,6 @@
 10. [Privacy & Safety Guarantees](#-privacy--safety-guarantees)
 11. [Troubleshooting & FAQ](#-troubleshooting--faq)
 12. [Contributing](#-contributing)
-13. [License](#-license)
 
 ---
 

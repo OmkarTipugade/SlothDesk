@@ -17,9 +17,9 @@
     },
     "types": [
       "vitest/globals"
-    ],
-    "exclude": [
-      "**/*.test.*"
     ]
-  }
+  },
+  "exclude": [
+    "**/*.test.*"
+  ]
 }

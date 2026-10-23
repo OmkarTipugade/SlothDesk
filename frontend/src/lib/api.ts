@@ -4,9 +4,12 @@ const baseUrl = (import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000').r
 const timeoutMs = 10_000
 
 class ApiError extends Error {
-  constructor(message: string, readonly status?: number) {
+  readonly status?: number
+
+  constructor(message: string, status?: number) {
     super(message)
     this.name = 'ApiError'
+    this.status = status
   }
 }
 
@@ -76,4 +79,3 @@ export const api = {
 }
 
 export { ApiError, baseUrl }
-

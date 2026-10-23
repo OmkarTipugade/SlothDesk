@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import {
-  Archive, ArrowRight, Check, CheckCircle2, ChevronDown, CircleAlert, ClipboardList,
+  Archive, ArrowRight, Check, CheckCircle2, CircleAlert,
   Clock3, FileArchive, FileImage, FileText, FolderOpen, LayoutDashboard, LoaderCircle,
   Menu, Moon, MoreHorizontal, RefreshCw, Search, Settings, ShieldCheck, Sparkles,
   Sun, X, XCircle,
@@ -87,8 +87,6 @@ function App() {
   }
 
   const title = navItems.find((item) => item.id === page)?.label ?? 'Overview'
-  const selectedCount = selected.size
-
   return (
     <div className="app-shell">
       <aside className={`sidebar ${mobileNav ? 'sidebar-open' : ''}`}>

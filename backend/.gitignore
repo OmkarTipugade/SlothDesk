@@ -3,4 +3,14 @@ __pycache__/
 .pytest_cache/
 .env
 *.py[cod]
-.env
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.slothdesk_data/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+*.egg-info/
+dist/
+build/

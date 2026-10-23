@@ -1,6 +1,6 @@
 import type { ApplyResult, FileRecord, Health, PlanAction } from '../types'
 
-const baseUrl = (import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '')
+const baseUrl = (import.meta.env.VITE_API_BASE_URL).replace(/\/$/, '')
 const timeoutMs = 10_000
 
 class ApiError extends Error {

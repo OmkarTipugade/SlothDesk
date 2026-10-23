@@ -31,9 +31,9 @@ const fileIcon = (extension: string) => {
   if (['.mp3', '.wav', '.flac', '.aac', '.ogg', '.oga', '.m4a', '.wma', '.aiff', '.aif', '.alac', '.opus', '.mid', '.midi', '.amr', '.ape', '.ac3', '.pcm'].includes(ext)) return FileAudio
   if (['.mp4', '.m4v', '.mkv', '.avi', '.mov', '.wmv', '.webm', '.flv', '.f4v', '.mpg', '.mpeg', '.m2v', '.3gp', '.3g2', '.ts', '.mts', '.m2ts', '.vob', '.ogv', '.divx'].includes(ext)) return FileVideo
   if (['.zip', '.tar', '.gz', '.bz2', '.rar', '.7z'].includes(ext)) return FileArchive
-  if (['.cpp', '.c', '.py', '.go', '.java', '.ts', '.html', '.css', '.js', '.php', '.rb','.kt','.rs'].includes(ext)) return FileCode
-  if (['.json', '.sql', '.xml','.yml','.yaml','.toml', '.ini',"xlsx"].includes(ext)) return Database
-  if (['.txt','.md','.pdf','.doc','.docx'].includes(ext)) return FileText
+  if (['.cpp', '.c', '.cc', '.cxx', '.h', '.hpp', '.cs', '.py', '.pyw', '.ipynb', '.go', '.java', '.ts', '.tsx', '.js', '.jsx', '.html', '.htm', '.css', '.scss', '.sass', '.less', '.php', '.rb', '.kt', '.kts', '.rs', '.swift', '.dart', '.vue', '.svelte', '.sh', '.bash', '.zsh', '.lua', '.r'].includes(ext)) return FileCode
+  if (['.json', '.jsonl', '.ndjson', '.sql', '.sqlite', '.sqlite3', '.db', '.xml', '.yml', '.yaml', '.toml', '.ini', '.csv', '.tsv', '.parquet', '.arrow', '.feather', '.avro', '.xlsx', '.xls', '.ods'].includes(ext)) return Database
+  if (['.txt', '.md', '.pdf', '.doc', '.docx', '.rtf', '.odt', '.tex'].includes(ext)) return FileText
   return Braces
 }
 

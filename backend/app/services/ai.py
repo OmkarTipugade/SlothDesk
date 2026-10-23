@@ -52,6 +52,18 @@ categories by moving them into category subdirectories.
 
 ALLOWED CATEGORIES: Documents, Images, Audio, Video, Invoices, Resumes, Notes, Code, Data, Other
 
+CATEGORY MAPPING RULES:
+- Code: Source code files, scripts, markup, styles (e.g. .py, .js, .ts, .tsx, .jsx, .cpp, .c, .h, .java, .rs, .go, .html, .css, .php, .rb, .sh).
+- Data: Structured data, databases, analytics, tables, spreadsheets (e.g. .json, .csv, .tsv, .sql, .xml, .yaml, .yml, .toml, .ini, .parquet, .sqlite, .xlsx, .xls).
+- Audio: Audio recordings and music (e.g. .mp3, .wav, .flac, .aac, .m4a, .ogg).
+- Video: Video clips and movies (e.g. .mp4, .mkv, .mov, .avi, .webm).
+- Images: Photos, graphics, screenshots (e.g. .png, .jpg, .svg, .gif, .webp).
+- Invoices: Bills, payment receipts, invoice documents.
+- Resumes: CVs, resumes, job applications.
+- Notes: Meeting notes, markdown memos, documentation notes (e.g. .md, notes.txt).
+- Documents: General documents, reports, presentations (e.g. .pdf, .docx).
+- Other: Files that do not fit into any above category.
+
 RULES:
 1. Output ONLY valid JSON matching the required schema. No markdown, no commentary.
 2. Keep thinking and reasoning extremely concise. Output the final JSON immediately.

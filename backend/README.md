@@ -1,196 +1,169 @@
 # SlothDesk Backend
 
-Local-first AI file organizer backend — a **Hacktoberfest 2026 "Slow and Steady"** project.
+The FastAPI backend for **SlothDesk** — a local-first, privacy-respecting AI file organizer. It scans a configured local directory, uses a local open-weight language model via [Ollama](https://ollama.com) to propose a structured organization plan, and executes verified moves only after explicit user confirmation.
 
-SlothDesk helps you organize files in a selected directory using a locally running open-weight AI model.  Your files never leave your machine.
+---
 
-## Quick Start
+## Features
+
+- **Local AI Classification**: Queries a local LLM (`qwen3:4b` via Ollama) using structured JSON output to organize unorganized files into logical subdirectories.
+- **Rich Organization Categories**:
+  - **`Documents`**: General documents, PDF manuals, Word documents (`.pdf`, `.doc`, `.docx`, `.odt`, `.rtf`, `.tex`).
+  - **`Images`**: Pictures and screenshots (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.svg`, `.bmp`, `.tiff`, `.heic`).
+  - **`Audio`**: Songs, recordings, and audio files (`.mp3`, `.wav`, `.flac`, `.aac`, `.ogg`, `.m4a`, `.wma`, `.aiff`, `.opus`, etc.).
+  - **`Video`**: Movies, clips, and recordings (`.mp4`, `.m4v`, `.mkv`, `.avi`, `.mov`, `.wmv`, `.webm`, `.flv`, `.mpeg`, etc.).
+  - **`Code`**: Source code files, scripts, and markup (`.py`, `.js`, `.ts`, `.tsx`, `.jsx`, `.cpp`, `.c`, `.h`, `.java`, `.rs`, `.go`, `.html`, `.css`, `.sh`, etc.).
+  - **`Data`**: Databases, tabular datasets, analytics, and configs (`.json`, `.csv`, `.tsv`, `.sql`, `.sqlite`, `.parquet`, `.xml`, `.yaml`, `.xlsx`, etc.).
+  - **`Invoices`**: Receipts, payment notices, and billing files.
+  - **`Resumes`**: CVs, resumes, and job application profiles.
+  - **`Notes`**: Documentation, memos, and markdown notes (`.md`, `notes.txt`).
+  - **`Other`**: Miscellaneous files that do not cleanly fit other categories.
+- **Two-Phase Non-Destructive Execution**: Validates all actions across 10 security checks before initiating moves. Employs pre-move SHA-256 fingerprint verification and best-effort rollback on failure.
+- **Duplicate Detection**: Fast SHA-256 content hashing to identify duplicate files without reading contents unnecessarily.
+- **Audit Logging**: Persists all completed moves, skipped items, and operation metrics to SQLite.
+- **Strict Security Model**:
+  - Restricts operations exclusively to `SLOTHDESK_ROOT`.
+  - Rejects path traversal (`..`), symlinks, and absolute destination paths.
+  - Independent server-side plan validation (AI output is never blindly trusted).
+  - Never deletes files.
+
+---
+
+## Tech Stack
+
+- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) + [Uvicorn](https://www.uvicorn.org/)
+- **Data Validation**: [Pydantic v2](https://docs.pydantic.dev/) + `pydantic-settings`
+- **HTTP Client**: [HTTPX](https://www.python-httpx.org/) (async requests to Ollama API)
+- **Database**: SQLite3 (audit history and operations log)
+- **Local AI Provider**: [Ollama](https://ollama.com) running `qwen3:4b`
+- **Testing**: [pytest](https://docs.pytest.org/) + `pytest-asyncio` (67 unit tests)
+
+---
+
+## Getting Started
 
 ### 1. Prerequisites
 
-- macOS with Python 3.9+
-- [Ollama](https://ollama.com) installed and running
-- The `qwen3:4b` model downloaded
+- macOS / Linux with Python 3.9+
+- [Ollama](https://ollama.com) installed and running locally
+- Ollama model `qwen3:4b` downloaded
 
 ```bash
-# Start Ollama (if not already running)
+# Start Ollama service (if not already running)
 ollama serve
 
-# Download the model
+# Pull the model
 ollama pull qwen3:4b
-
-# Verify
-ollama list
 ```
 
-### 2. Install Dependencies
+### 2. Environment Setup
+
+Create and activate a virtual environment:
 
 ```bash
 cd backend
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Configure
+### 3. Configuration
 
-Copy the example environment file and adjust if needed:
+Copy the example configuration:
 
 ```bash
 cp .env.example .env
 ```
 
-Key settings in `.env`:
+Edit `.env` to configure your settings:
 
-| Variable | Default | Description |
-|---|---|---|
-| `SLOTHDESK_ROOT` | `~/SlothDesk_Demo` | Directory to organize |
-| `OLLAMA_URL` | `http://127.0.0.1:11434` | Local Ollama endpoint |
-| `OLLAMA_MODEL` | `qwen3:4b` | Ollama model name |
-| `OLLAMA_TIMEOUT_SECONDS` | `180` | Request timeout |
-| `MAX_SCAN_FILES` | `500` | Maximum files to scan |
+```env
+# Path to the directory you want to organize
+SLOTHDESK_ROOT=~/Downloads
 
-> **Important:** `SLOTHDESK_ROOT` defaults to a dedicated `~/SlothDesk_Demo` folder, not your home directory or Downloads.
+# Ollama local endpoint and model
+OLLAMA_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=qwen3:4b
+OLLAMA_TIMEOUT_SECONDS=180
 
-### 4. Set Up Demo Files
-
-Create some sample files to test with:
-
-```bash
-mkdir -p ~/SlothDesk_Demo
-cd ~/SlothDesk_Demo
-
-# Create sample files
-echo "Q3 Financial Report" > quarterly_report.pdf
-echo "Meeting notes from standup" > standup_notes.txt
-echo "John Doe Resume" > john_doe_resume.docx
-echo "Invoice #1234" > invoice_march_2024.pdf
-cp /System/Library/Desktop\ Pictures/*.heic . 2>/dev/null || true
+# Safety limits
+MAX_SCAN_FILES=500
+MAX_FILE_SIZE_MB=50
+MAX_PLAN_ACTIONS=100
 ```
 
-### 5. Start the Backend
+### 4. Running the Server
+
+Start the FastAPI application with Uvicorn:
 
 ```bash
-cd backend
-source .venv/bin/activate
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-The API is available at `http://127.0.0.1:8000`.  Interactive docs at `http://127.0.0.1:8000/docs`.
+- API Base: `http://127.0.0.1:8000`
+- Interactive OpenAPI Docs: `http://127.0.0.1:8000/docs`
 
-### 6. Run the Frontend
-
-In a separate terminal:
-
-```bash
-cd frontend
-npm run dev
-```
-
-Open `http://localhost:5173` in your browser.
+---
 
 ## API Endpoints
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/api/health` | Backend health + config |
-| `GET` | `/api/ollama/status` | Ollama & model availability |
-| `GET` | `/api/scan` | Scan directory → file inventory |
-| `POST` | `/api/plan` | AI classification → validated plan |
-| `POST` | `/api/apply` | Execute approved file moves |
-| `GET` | `/api/history` | Paginated operation history |
-| `GET` | `/api/stats` | Aggregate metrics |
-| `GET` | `/api/duplicates` | SHA-256 duplicate detection |
+| `GET` | `/api/health` | Backend health, active model, and configured root directory |
+| `GET` | `/api/ollama/status` | Ollama service and model availability status |
+| `GET` | `/api/scan` | Scans `SLOTHDESK_ROOT` and returns file inventory |
+| `POST` | `/api/plan` | Generates AI classification plan for scanned files (non-destructive) |
+| `POST` | `/api/apply` | Executes user-approved file moves with rollback protection |
+| `GET` | `/api/history` | Paginated history of applied operations from SQLite |
+| `GET` | `/api/stats` | Aggregated metrics (files scanned, move success/failure counts) |
+| `GET` | `/api/duplicates` | Scans for duplicate files via SHA-256 hashes |
 
-### Example Requests
-
-```bash
-# Health check
-curl http://127.0.0.1:8000/api/health
-
-# Scan files
-curl http://127.0.0.1:8000/api/scan
-
-# Generate AI plan
-curl -X POST http://127.0.0.1:8000/api/plan
-
-# Apply selected actions
-curl -X POST http://127.0.0.1:8000/api/apply \
-  -H "Content-Type: application/json" \
-  -d '{"actions": [{"source": "report.pdf", "destination": "Documents/report.pdf", "category": "Documents", "reason": "PDF document"}], "confirmed": true}'
-
-# History (page 1, 20 per page)
-curl "http://127.0.0.1:8000/api/history?page=1&page_size=20"
-
-# Duplicates
-curl http://127.0.0.1:8000/api/duplicates
-```
+---
 
 ## Testing
+
+Run the comprehensive unit test suite:
 
 ```bash
 source .venv/bin/activate
 python -m pytest tests/ -v
 ```
 
-All tests use temporary directories and mocked Ollama — no live model required, no real files touched.
+All 67 tests use isolated temporary directories and mocked Ollama responses — no live model required, no real files modified.
 
-### Optional: Live Ollama Integration Test
-
-If Ollama is running with `qwen3:4b` available:
-
-```bash
-python -m pytest tests/ -v -k "integration" --run-integration
-```
-
-## Troubleshooting
-
-| Problem | Solution |
-|---|---|
-| "Ollama is not running" | Run `ollama serve` or open the Ollama app |
-| "Model not found" | Run `ollama pull qwen3:4b` |
-| "SLOTHDESK_ROOT does not exist" | Create the directory or update `.env` |
-| Timeout errors | Plan generation can take longer on the first model request; the default timeout is 180 seconds. Increase `OLLAMA_TIMEOUT_SECONDS` in `.env` only if needed. |
-| CORS errors in browser | Ensure backend runs on port 8000 and frontend on 5173 |
+---
 
 ## Architecture
 
 ```
 backend/
-  app/
-    main.py            ← FastAPI app, CORS, startup, exception handlers
-    config.py          ← Validated settings from .env
-    schemas.py         ← Pydantic v2 request/response models
-    database.py        ← SQLite initialization and connection
-    api/
-      routes.py        ← All API endpoints
-    services/
-      ollama.py        ← Ollama HTTP client with typed exceptions
-      scanner.py       ← File discovery, hashing, duplicate detection
-      ai.py            ← AI prompt building and response parsing
-      planner.py       ← Server-side plan validation (13 checks)
-      organizer.py     ← Two-phase file mover with rollback
-      history.py       ← SQLite persistence and pagination
-    security/
-      paths.py         ← Path traversal prevention, symlink rejection
-  tests/               ← 65 tests covering all modules
+├── app/
+│   ├── main.py            # FastAPI application, CORS, exception handlers, lifecycle
+│   ├── config.py          # Settings validation and path resolution via Pydantic
+│   ├── schemas.py         # Request and response models, FileCategory enum
+│   ├── database.py        # SQLite database connection and schema setup
+│   ├── api/
+│   │   └── routes.py      # Route definitions for all endpoints
+│   ├── security/
+│   │   └── paths.py       # Path traversal guards, symlink checks, root boundary checks
+│   └── services/
+│       ├── scanner.py     # Directory scanning, file-type classification, hashing
+│       ├── ollama.py      # Async HTTP client for Ollama API with typed error handling
+│       ├── ai.py          # AI prompt generation, JSON schema, response parser
+│       ├── planner.py     # Server-side validation of proposed move actions
+│       ├── organizer.py   # Two-phase file mover with fingerprinting & rollback
+│       └── history.py     # SQLite persistence for operation records and statistics
+├── tests/                 # 67 unit and integration tests covering all modules
+├── requirements.txt       # Python dependencies
+└── pyproject.toml         # Tooling and pytest configuration
 ```
+
+---
 
 ## Security Model
 
-- All file operations restricted to `SLOTHDESK_ROOT`
-- Path traversal and symlink rejection at every layer
-- AI model output is never trusted — independent server-side validation
-- Filenames treated as untrusted data (prompt injection defense)
-- No shell execution, no file deletion, no cloud AI
-- CORS restricted to local frontend origins
-- Backend binds to `127.0.0.1` only
-- No automatic execution — user must explicitly confirm
-
-## Known Limitations
-
-- Filesystem operations are not truly atomic; a crash mid-batch may leave partial results
-- Cross-filesystem moves copy-then-delete (not atomic)
-- Concurrent filesystem modifications by other processes are detected but not prevented
-- Rollback is best-effort; rollback failures are reported but files stay at their new location
-- The AI model may produce suboptimal categorizations depending on filenames
-- No authentication (localhost-only by design)
+1. **Sandboxed Root**: All operations are strictly constrained within `SLOTHDESK_ROOT`. Any attempt to escape via relative paths (`../`) or symlinks is rejected.
+2. **Untrusted AI Output**: The AI model is never trusted to enforce security rules. All proposed actions undergo independent server-side validation.
+3. **No Deletions**: The application only performs directory creation and file relocation (`move/rename`). It contains no file deletion capability.
+4. **Untrusted Filenames**: File names and metadata are treated as data, preventing prompt injection attacks against the local model.
+5. **Localhost Only**: Binds strictly to `127.0.0.1` with restricted CORS headers.

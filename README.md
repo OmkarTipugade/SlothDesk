@@ -68,7 +68,7 @@ Almost every computer user suffers from messy folders:
 
 ---
 
-## ⚙️ How It Works
+## How It Works
 
 SlothDesk operates in a simple, non-destructive **4-step workflow**:
 

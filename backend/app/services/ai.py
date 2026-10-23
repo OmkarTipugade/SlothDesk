@@ -50,7 +50,7 @@ _SYSTEM_PROMPT = """\
 You are a file organizer. Your task is to suggest how to organize files into \
 categories by moving them into category subdirectories.
 
-ALLOWED CATEGORIES: Documents, Images, Invoices, Resumes, Notes, Other
+ALLOWED CATEGORIES: Documents, Images, Audio, Video, Invoices, Resumes, Notes, Code, Data, Other
 
 RULES:
 1. Output ONLY valid JSON matching the required schema. No markdown, no commentary.

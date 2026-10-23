@@ -136,3 +136,47 @@ class TestFindDuplicates:
         assert len(groups) == 1
         assert len(groups[0].paths) == 2
         assert set(groups[0].paths) == {"file_a.txt", "file_b.txt"}
+
+    def test_detects_audio_and_video_file_types(self, tmp_path):
+        root = str(tmp_path / "media_test")
+        os.makedirs(root)
+
+        media_files = [
+            ("song.mp3", "audio"),
+            ("voice.wav", "audio"),
+            ("lossless.flac", "audio"),
+            ("track.m4a", "audio"),
+            ("clip.mp4", "video"),
+            ("movie.mkv", "video"),
+            ("sample.mov", "video"),
+            ("stream.webm", "video"),
+        ]
+        for name, _ in media_files:
+            with open(os.path.join(root, name), "wb") as f:
+                f.write(b"dummy media content")
+
+        files = scan_directory(root)
+        type_by_name = {f.name: f.file_type for f in files}
+        for name, expected_type in media_files:
+            assert type_by_name[name] == expected_type
+
+    def test_detects_code_and_data_file_types(self, tmp_path):
+        root = str(tmp_path / "code_data_test")
+        os.makedirs(root)
+
+        code_data_files = [
+            ("script.py", "code"),
+            ("app.js", "code"),
+            ("style.css", "code"),
+            ("config.json", "data"),
+            ("data.csv", "data"),
+            ("notes.md", "notes"),
+        ]
+        for name, _ in code_data_files:
+            with open(os.path.join(root, name), "wb") as f:
+                f.write(b"dummy code or data content")
+
+        files = scan_directory(root)
+        type_by_name = {f.name: f.file_type for f in files}
+        for name, expected_type in code_data_files:
+            assert type_by_name[name] == expected_type

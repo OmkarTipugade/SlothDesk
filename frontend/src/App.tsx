@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import {
   Archive, ArrowRight, Check, CheckCircle2, CircleAlert,
-  Clock3, FileArchive, FileImage, FileText, FolderOpen, LayoutDashboard, LoaderCircle,
+  Clock3, FileArchive, FileAudio, FileImage, FileText, FileVideo, FolderOpen, LayoutDashboard, LoaderCircle,
   Menu, Moon, MoreHorizontal, RefreshCw, Search, Settings, ShieldCheck, Sparkles,
-  Sun, X, XCircle,
+  Sun, X, XCircle, FileCode, Database, Braces
 } from 'lucide-react'
 import { api, baseUrl } from './lib/api'
 import type { ApplyResult, FileRecord, Health, PlanAction } from './types'
@@ -26,9 +26,15 @@ const formatBytes = (bytes: number) => {
 }
 
 const fileIcon = (extension: string) => {
-  if (['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(extension.toLowerCase())) return FileImage
-  if (['.zip', '.tar', '.gz'].includes(extension.toLowerCase())) return FileArchive
-  return FileText
+  const ext = extension.toLowerCase()
+  if (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.tiff', '.ico', '.heic'].includes(ext)) return FileImage
+  if (['.mp3', '.wav', '.flac', '.aac', '.ogg', '.oga', '.m4a', '.wma', '.aiff', '.aif', '.alac', '.opus', '.mid', '.midi', '.amr', '.ape', '.ac3', '.pcm'].includes(ext)) return FileAudio
+  if (['.mp4', '.m4v', '.mkv', '.avi', '.mov', '.wmv', '.webm', '.flv', '.f4v', '.mpg', '.mpeg', '.m2v', '.3gp', '.3g2', '.ts', '.mts', '.m2ts', '.vob', '.ogv', '.divx'].includes(ext)) return FileVideo
+  if (['.zip', '.tar', '.gz', '.bz2', '.rar', '.7z'].includes(ext)) return FileArchive
+  if (['.cpp', '.c', '.py', '.go', '.java', '.ts', '.html', '.css', '.js', '.php', '.rb','.kt','.rs'].includes(ext)) return FileCode
+  if (['.json', '.sql', '.xml','.yml','.yaml','.toml', '.ini',"xlsx"].includes(ext)) return Database
+  if (['.txt','.md','.pdf','.doc','.docx'].includes(ext)) return FileText
+  return Braces
 }
 
 function App() {

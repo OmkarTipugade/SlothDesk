@@ -158,8 +158,8 @@ class OllamaClient:
             "stream": False,
             "options": {
                 "temperature": temperature,
-                "num_ctx": 4096,
-                "num_predict": 2048,
+                "num_ctx": 8192,
+                "num_predict": 4096,
             },
         }
 
@@ -194,6 +194,9 @@ class OllamaClient:
 
         content = message.get("content")
         if not isinstance(content, str) or not content.strip():
+            done_reason = data.get("done_reason", "")
+            if done_reason == "length":
+                raise OllamaBadResponse("Model reached token limit before completing response. Increase num_predict.")
             raise OllamaBadResponse("Response message has no content.")
 
         return content.strip()

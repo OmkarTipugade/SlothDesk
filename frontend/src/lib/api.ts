@@ -1,7 +1,7 @@
 import type { ApplyResult, FileRecord, Health, PlanAction } from '../types'
 
-const baseUrl = (import.meta.env.VITE_API_BASE_URL).replace(/\/$/, '')
-const timeoutMs = 10_000
+const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '')
+const defaultTimeoutMs = 15_000
 
 class ApiError extends Error {
   readonly status?: number
@@ -13,7 +13,7 @@ class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(path: string, init?: RequestInit, timeoutMs = defaultTimeoutMs): Promise<T> {
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs)
   try {
@@ -68,7 +68,11 @@ export const api = {
     return data.files
   },
   plan: async () => {
-    const data = await request<{ actions: PlanAction[] }>('/api/plan', { method: 'POST', body: JSON.stringify({}) })
+    const data = await request<{ actions: PlanAction[] }>(
+      '/api/plan',
+      { method: 'POST', body: JSON.stringify({}) },
+      120_000,
+    )
     if (!data || !Array.isArray(data.actions)) throw new ApiError('The plan response was malformed.')
     return data.actions
   },

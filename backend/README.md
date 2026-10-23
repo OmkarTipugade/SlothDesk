@@ -46,7 +46,7 @@ Key settings in `.env`:
 | `SLOTHDESK_ROOT` | `~/SlothDesk_Demo` | Directory to organize |
 | `OLLAMA_URL` | `http://127.0.0.1:11434` | Local Ollama endpoint |
 | `OLLAMA_MODEL` | `qwen3:4b` | Ollama model name |
-| `OLLAMA_TIMEOUT_SECONDS` | `120` | Request timeout |
+| `OLLAMA_TIMEOUT_SECONDS` | `180` | Request timeout |
 | `MAX_SCAN_FILES` | `500` | Maximum files to scan |
 
 > **Important:** `SLOTHDESK_ROOT` defaults to a dedicated `~/SlothDesk_Demo` folder, not your home directory or Downloads.
@@ -149,7 +149,7 @@ python -m pytest tests/ -v -k "integration" --run-integration
 | "Ollama is not running" | Run `ollama serve` or open the Ollama app |
 | "Model not found" | Run `ollama pull qwen3:4b` |
 | "SLOTHDESK_ROOT does not exist" | Create the directory or update `.env` |
-| Timeout errors | Increase `OLLAMA_TIMEOUT_SECONDS` in `.env` |
+| Timeout errors | Plan generation can take longer on the first model request; the default timeout is 180 seconds. Increase `OLLAMA_TIMEOUT_SECONDS` in `.env` only if needed. |
 | CORS errors in browser | Ensure backend runs on port 8000 and frontend on 5173 |
 
 ## Architecture

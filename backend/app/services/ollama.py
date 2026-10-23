@@ -156,6 +156,9 @@ class OllamaClient:
             "model": self.model,
             "messages": messages,
             "stream": False,
+            # File plans are short JSON responses. Keep thinking models from
+            # spending the entire request budget on unnecessary reasoning.
+            "think": False,
             "options": {
                 "temperature": temperature,
                 "num_ctx": 8192,

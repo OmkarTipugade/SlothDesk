@@ -82,7 +82,7 @@ def _extract_json(text: str) -> str:
 
 def _build_user_message(files: List[FileRecord]) -> str:
     """Build the user prompt listing file metadata for classification."""
-    lines = ["Organize these files:\n"]
+    lines = ["/no_think", "Organize these files:\n"]
     for f in files:
         lines.append(f"- {f.relative_path} ({f.extension}, {f.size_bytes} bytes, type: {f.file_type or 'unknown'})")
     return "\n".join(lines)

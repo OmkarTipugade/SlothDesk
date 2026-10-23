@@ -2,6 +2,7 @@ import type { ApplyResult, FileRecord, Health, PlanAction } from '../types'
 
 const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '')
 const defaultTimeoutMs = 15_000
+const planTimeoutMs = 195_000
 
 class ApiError extends Error {
   readonly status?: number
@@ -13,7 +14,12 @@ class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit, timeoutMs = defaultTimeoutMs): Promise<T> {
+async function request<T>(
+  path: string,
+  init?: RequestInit,
+  timeoutMs = defaultTimeoutMs,
+  timeoutMessage = 'The request timed out. Is the SlothDesk backend running?',
+): Promise<T> {
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs)
   try {
@@ -39,7 +45,7 @@ async function request<T>(path: string, init?: RequestInit, timeoutMs = defaultT
   } catch (error) {
     if (error instanceof ApiError) throw error
     if (error instanceof DOMException && error.name === 'AbortError') {
-      throw new ApiError('The request timed out. Is the SlothDesk backend running?')
+      throw new ApiError(timeoutMessage)
     }
     throw new ApiError('Unable to reach the SlothDesk backend.')
   } finally {
@@ -71,7 +77,8 @@ export const api = {
     const data = await request<{ actions: PlanAction[] }>(
       '/api/plan',
       { method: 'POST', body: JSON.stringify({}) },
-      120_000,
+      planTimeoutMs,
+      'Plan generation timed out. The local AI model may still be loading or under heavy load.',
     )
     if (!data || !Array.isArray(data.actions)) throw new ApiError('The plan response was malformed.')
     return data.actions

@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     # ── Ollama ──────────────────────────────────────────────────
     ollama_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen3:4b"
-    ollama_timeout_seconds: int = 120
+    ollama_timeout_seconds: int = 180
 
     # ── Limits ──────────────────────────────────────────────────
     max_scan_files: int = 500
